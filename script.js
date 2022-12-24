@@ -1,5 +1,5 @@
 const gameBoard = (() => {
-  const boardArray = ['', '', '', '', '', '', '', '', ''];
+  let boardArray = ['', '', '', '', '', '', '', '', ''];
   const markIndex = (index, symbol) => {
     if (boardArray[index] === '') {
       boardArray[index] = symbol;
@@ -22,7 +22,8 @@ const gameBoard = (() => {
       return false;
     }
   };
-  return { markIndex, checkWin };
+  const emptyBoard = () => boardArray = ['', '', '', '', '', '', '', '', ''];
+  return { markIndex, checkWin, emptyBoard };
 })();
 
 const player = (symbol) => {
@@ -35,38 +36,116 @@ const player = (symbol) => {
 const displayController = (() => {
   const player1 = player('X');
   const player2 = player('O');
+  let player1Name = 'Player 1';
+  let player2Name = 'Player 2';
   let isPlayer1Turn = true;
   let round = 1;
   const boardDisplay = document.querySelector('#board');
   const squaresDisplay = boardDisplay.children;
+  const boardContainer = document.querySelector('#board-container');
+  const startButton = document.querySelector('#start-button');
+  const introContainer = document.querySelector('.intro-container');
+  const playerNameInput1 = document.querySelector('#player1-name');
+  const playerNameInput2 = document.querySelector('#player2-name');
+  const submitNamesButton = document.querySelector('#submit-names-button');
+  const namesForm = document.querySelector('#names-form');
+  const infoLabel = document.querySelector('#info-label');
+  const restartButton = document.querySelector('#restart-button');
+
+  startButton.addEventListener('click', () => {
+    introContainer.classList.add('hidden');
+    namesForm.style.display = 'flex';
+  });
+
+  submitNamesButton.addEventListener('click', () => {
+    if (playerNameInput1.value !== '') {
+      player1Name = playerNameInput1.value;
+      infoLabel.textContent = `${player1Name}'s turn`;
+    }
+    if (playerNameInput2.value !== '') {
+      player2Name = playerNameInput2.value;
+    }
+    namesForm.style.display = 'none';
+    boardContainer.style.display = 'flex';
+  });
+
+  infoLabel.textContent = `${player1Name}'s turn`;
+
+  restartButton.addEventListener('click', () => {
+    gameBoard.emptyBoard();
+    for (let i = 0; i < squaresDisplay.length; i++) {
+      const squareDisplay = squaresDisplay[i];
+      squareDisplay.textContent = '';
+      squareDisplay.addEventListener('click', playerTurn);
+    }
+    isPlayer1Turn = true;
+    round = 1;
+    infoLabel.textContent = `${player1Name}'s turn`;
+    infoLabel.className = '';
+    infoLabel.classList.add('blue-turn');
+    restartButton.style.display = 'none';
+  })
+
+  const endGame = () => {
+    for (let i = 0; i < squaresDisplay.length; i++) {
+      const squareDisplay = squaresDisplay[i];
+      squareDisplay.removeEventListener('click', playerTurn, false);
+    }
+  }
+
 
   const playerTurn = (event) => {
-    if (round >= 9) {
-      alert('Game Over');
-    }
     const square = event.target;
-    if (isPlayer1Turn) {
-      if (player1.markSquare(square.id) === 'Square marked') {
-        square.textContent = player1.symbol;
-        isPlayer1Turn = !isPlayer1Turn;
-        round += 1;
-        if(gameBoard.checkWin(player1.symbol)) {
-          alert('player 1 wins!');
-        }
-      }      
+    if (round >= 9) {
+      infoLabel.textContent = 'Tie game';
+      infoLabel.classList.remove('blue-turn');
+      infoLabel.classList.add('tie-game');
+      player1.markSquare(square.id);
+      square.textContent = player1.symbol;
+      square.classList.add('player-x');
+      restartButton.style.display = 'inline';
     } else {
-      if (player2.markSquare(square.id) === 'Square marked') {
-        square.textContent = player2.symbol;
-        isPlayer1Turn = !isPlayer1Turn;
-        round += 1;
-        if(gameBoard.checkWin(player2.symbol)) {
-          alert('player 2 wins!');
+      if (isPlayer1Turn) {
+        if (player1.markSquare(square.id) === 'Square marked') {
+          square.classList.add('player-x');
+          square.textContent = player1.symbol;
+          isPlayer1Turn = !isPlayer1Turn;
+          round += 1;
+          infoLabel.textContent = `${player2Name}'s turn`;
+          if(gameBoard.checkWin(player1.symbol)) {
+            infoLabel.textContent = `${player1Name} wins!`;
+            infoLabel.classList.remove('blue-turn');
+            infoLabel.classList.add('win-game');
+            restartButton.style.display = 'inline';
+            endGame();
+          } else {
+            infoLabel.classList.remove('blue-turn');
+            infoLabel.classList.add('red-turn');
+          }
+        }      
+      } else {
+        if (player2.markSquare(square.id) === 'Square marked') {
+          square.classList.add('player-o');
+          square.textContent = player2.symbol;
+          isPlayer1Turn = !isPlayer1Turn;
+          round += 1;
+          infoLabel.textContent = `${player1Name}'s turn`;
+          if(gameBoard.checkWin(player2.symbol)) {
+            infoLabel.textContent = `${player2Name} wins!`
+            infoLabel.classList.remove('red-turn');
+            infoLabel.classList.add('win-game');
+            restartButton.style.display = 'inline';
+            endGame();
+          } else {
+            infoLabel.classList.remove('red-turn');
+            infoLabel.classList.add('blue-turn');
+          }
         }
       }
     }
   };
 
-  for(let i = 0; i < squaresDisplay.length; i++) {
+  for (let i = 0; i < squaresDisplay.length; i++) {
     const squareDisplay = squaresDisplay[i];
     squareDisplay.addEventListener('click', playerTurn);
   }

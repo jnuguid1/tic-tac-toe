@@ -6,9 +6,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tic Tac Toe</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Open+Sans">
+  <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter+Tight">
   <script src="./script.js" defer></script>
 </head>
 <body>
+  <div class="intro-container">
+    <h1>Welcome to <span>Tic</span> Tac <span>Toe</span> </h1>
+    <button id="start-button">
+      START
+    </button>
+  </div>
+  <div id="names-form">
+    <div class="input-container">
+      <div>
+        <label for="player1-name">Player 1 Name</label>
+        <input type="text" id="player1-name" placeholder="Player 1">
+      </div>
+      <div>
+        <label for="player2-name">Player 2 Name</label>
+        <input type="text" id="player2-name" placeholder="Player 2">
+      </div>
+    </div>
+    <button id="submit-names-button">NEXT</button>
+  </div>
   <div id="board-container">
     <div id="board">
       <div class="square" id="0"></div>
@@ -23,6 +46,8 @@
       <div class="square" id="7"></div>
       <div class="square" id="8"></div>
     </div>
+    <p id="info-label" class="blue-turn"></p>
+    <button id="restart-button">RESTART</button>
   </div>
 </body>
 </html>
